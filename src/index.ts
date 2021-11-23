@@ -1,4 +1,5 @@
 import * as dotenv from "dotenv";
+import { createWebhookModule, WebhookResponse } from "sipgateio";
 
 dotenv.config();
 
@@ -24,3 +25,23 @@ if (!process.env.ANNOUNCEMENT_FILE_URL) {
 const SERVER_ADDRESS = process.env.SIPGATE_WEBHOOK_SERVER_ADDRESS;
 const PORT = process.env.SIPGATE_WEBHOOK_SERVER_PORT;
 const { ANNOUNCEMENT_FILE_URL } = process.env;
+
+createWebhookModule()
+  .createServer({
+    port: PORT,
+    serverAddress: SERVER_ADDRESS,
+  })
+  .then((webhookServer) => {
+    webhookServer.onNewCall((newCallEvent) => {
+      console.log(`New call from ${newCallEvent.from} to ${newCallEvent.to}`);
+      return WebhookResponse.gatherDTMF({
+        maxDigits: 1,
+        timeout: 0,
+        announcement: ANNOUNCEMENT_FILE_URL,
+      });
+    });
+    webhookServer.onData((_) => {
+      console.log("Hang up call.");
+      return WebhookResponse.hangUpCall();
+    });
+  });
