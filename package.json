@@ -1,7 +1,7 @@
 {
-  "name": "sipgateio-boilerplate",
+  "name": "io-labs-time-controlled-callback",
   "version": "1.0.0",
-  "description": "A template for new sipgate.io projects containing Prettier, ESLint, Husky and TypeScript configuration files",
+  "description": "An example application that implements a time-controlled callback using sipgate.io",
   "main": "src/index.ts",
   "scripts": {
     "start": "ts-node .",
@@ -14,14 +14,14 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+ssh://git@github.com/sipgate-io/sipgateio-boilerplate.git"
+    "url": "git+ssh://git@github.com/sipgate-io/io-labs-time-controlled-callback.git"
   },
   "author": "",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/sipgate-io/sipgateio-boilerplate/issues"
+    "url": "https://github.com/sipgate-io/io-labs-time-controlled-callback/issues"
   },
-  "homepage": "https://github.com/sipgate-io/sipgateio-boilerplate#readme",
+  "homepage": "https://github.com/sipgate-io/io-labs-time-controlled-callback#readme",
   "devDependencies": {
     "@types/jest": "^27.0.2",
     "@types/node": "^16.11.6",
@@ -43,6 +43,7 @@
   },
   "dependencies": {
     "dotenv": "^10.0.0",
+    "sipgateio": "^2.5.5",
     "ts-node": "^10.4.0"
   }
 }
