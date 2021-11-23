@@ -48,6 +48,12 @@ const tokenId = process.env.SIPGATE_TOKEN_ID ?? "";
 const client = sipgateIO({ token, tokenId });
 const callModule = createCallModule(client);
 
+function initCallback(to: string) {
+  console.log("Initialize callback.");
+  const from = "deviceid";
+  callModule.initiate({ to, from });
+}
+
 createWebhookModule()
   .createServer({
     port: PORT,
@@ -56,9 +62,16 @@ createWebhookModule()
   .then((webhookServer) => {
     webhookServer.onNewCall((newCallEvent) => {
       if (newCallEvent.direction === WebhookDirection.OUT) {
+        console.log(
+          `New outgoing call from ${newCallEvent.from} to ${newCallEvent.to}`,
+        );
         return undefined;
       }
       console.log(`New call from ${newCallEvent.from} to ${newCallEvent.to}`);
+
+      setTimeout(() => {
+        initCallback(newCallEvent.from);
+      }, 60000);
       return WebhookResponse.gatherDTMF({
         maxDigits: 1,
         timeout: 0,
@@ -70,12 +83,3 @@ createWebhookModule()
       return WebhookResponse.hangUpCall();
     });
   });
-
-function initCallback() {
-  console.log("initCallback");
-  const to = "number to call";
-  const from = "deviceid";
-  callModule.initiate({ to, from });
-}
-
-initCallback();
