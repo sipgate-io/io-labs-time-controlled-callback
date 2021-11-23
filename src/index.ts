@@ -88,7 +88,7 @@ createWebhookModule()
         announcement: ANNOUNCEMENT_FILE_URL,
       });
     });
-    webhookServer.onData((_) => {
+    webhookServer.onData(() => {
       console.log("Hang up call.");
       return WebhookResponse.hangUpCall();
     });
