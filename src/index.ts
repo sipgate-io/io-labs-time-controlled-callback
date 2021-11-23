@@ -1,5 +1,11 @@
 import * as dotenv from "dotenv";
-import { createWebhookModule, WebhookResponse } from "sipgateio";
+import {
+  createCallModule,
+  createWebhookModule,
+  sipgateIO,
+  WebhookDirection,
+  WebhookResponse,
+} from "sipgateio";
 
 dotenv.config();
 
@@ -22,9 +28,25 @@ if (!process.env.ANNOUNCEMENT_FILE_URL) {
   process.exit();
 }
 
+if (!process.env.SIPGATE_TOKEN) {
+  console.error("ERROR: You need to provide a valid personal access token!\n");
+  process.exit();
+}
+
+if (!process.env.SIPGATE_TOKEN_ID) {
+  console.error("ERROR: You need to provide a personal access token ID!\n");
+  process.exit();
+}
+
 const SERVER_ADDRESS = process.env.SIPGATE_WEBHOOK_SERVER_ADDRESS;
 const PORT = process.env.SIPGATE_WEBHOOK_SERVER_PORT;
 const { ANNOUNCEMENT_FILE_URL } = process.env;
+
+const token = process.env.SIPGATE_TOKEN ?? "";
+const tokenId = process.env.SIPGATE_TOKEN_ID ?? "";
+
+const client = sipgateIO({ token, tokenId });
+const callModule = createCallModule(client);
 
 createWebhookModule()
   .createServer({
@@ -33,6 +55,9 @@ createWebhookModule()
   })
   .then((webhookServer) => {
     webhookServer.onNewCall((newCallEvent) => {
+      if (newCallEvent.direction === WebhookDirection.OUT) {
+        return undefined;
+      }
       console.log(`New call from ${newCallEvent.from} to ${newCallEvent.to}`);
       return WebhookResponse.gatherDTMF({
         maxDigits: 1,
@@ -45,3 +70,12 @@ createWebhookModule()
       return WebhookResponse.hangUpCall();
     });
   });
+
+function initCallback() {
+  console.log("initCallback");
+  const to = "number to call";
+  const from = "deviceid";
+  callModule.initiate({ to, from });
+}
+
+initCallback();
