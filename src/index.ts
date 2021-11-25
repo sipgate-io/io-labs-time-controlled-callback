@@ -48,21 +48,22 @@ if (!process.env.SIPGATE_TOKEN_ID) {
   process.exit();
 }
 
-const SERVER_ADDRESS = process.env.SIPGATE_WEBHOOK_SERVER_ADDRESS;
-const PORT = process.env.SIPGATE_WEBHOOK_SERVER_PORT;
-const { ANNOUNCEMENT_FILE_URL, CALLBACK_TIMEOUT, DEVICE_ID } = process.env;
+const {
+  SIPGATE_WEBHOOK_SERVER_ADDRESS: SERVER_ADDRESS,
+  SIPGATE_WEBHOOK_SERVER_PORT: PORT,
+  ANNOUNCEMENT_FILE_URL,
+  DEVICE_ID,
+  SIPGATE_TOKEN: TOKEN,
+  SIPGATE_TOKEN_ID: TOKENID,
+} = process.env;
 
-const token = process.env.SIPGATE_TOKEN;
-const tokenId = process.env.SIPGATE_TOKEN_ID;
+const CALLBACK_TIMEOUT = parseInt(process.env.CALLBACK_TIMEOUT ?? "60", 10) * 1000;
 
-const client = sipgateIO({ token, tokenId });
+const client = sipgateIO({ token: TOKEN, tokenId: TOKENID });
 const callModule = createCallModule(client);
 
-function initCallback(to: string) {
-  console.log("Initialize callback.");
-  const from = DEVICE_ID;
-  callModule.initiate({ to, from });
-}
+const initCallback = (to: string) =>
+  callModule.initiate({ to, from: DEVICE_ID });
 
 createWebhookModule()
   .createServer({
@@ -81,7 +82,7 @@ createWebhookModule()
 
       setTimeout(() => {
         initCallback(newCallEvent.from);
-      }, parseInt(CALLBACK_TIMEOUT ?? "60", 10) * 1000);
+      }, CALLBACK_TIMEOUT);
       return WebhookResponse.gatherDTMF({
         maxDigits: 1,
         timeout: 0,
