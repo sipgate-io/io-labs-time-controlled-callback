@@ -10,7 +10,7 @@
     "test:format": "prettier --check .",
     "fix:format": "prettier --write .",
     "prepare": "husky install",
-    "test": "jest"
+    "test": "jest --passWithNoTests"
   },
   "repository": {
     "type": "git",
